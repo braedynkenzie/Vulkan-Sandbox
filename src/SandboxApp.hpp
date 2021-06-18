@@ -2,6 +2,7 @@
 
 #include "SandboxWindow.hpp"
 #include "VulkanPipeline.hpp"
+#include "VulkanDevice.hpp"
 
 namespace VulkanSandbox {
 
@@ -16,7 +17,8 @@ namespace VulkanSandbox {
 
 	private:
 		SandboxWindow appWindow{ WIDTH, HEIGHT, APP_NAME };
-		VulkanPipeline vulkanPipeline{ "src/shaders/VertexShader.vert.spv", "src/shaders/FragmentShader.frag.spv" };
+		VulkanDevice vulkanDevice{ appWindow };
+		VulkanPipeline vulkanPipeline{ vulkanDevice, "src/shaders/VertexShader.vert.spv", "src/shaders/FragmentShader.frag.spv", VulkanPipeline::getDefaultPipelineConfigInfo(WIDTH, HEIGHT) };
 	};
 
 

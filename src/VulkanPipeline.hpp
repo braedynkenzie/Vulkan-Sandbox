@@ -1,18 +1,63 @@
 #pragma once 
 
+#include "VulkanDevice.hpp"
+
 #include <vector>
 #include <string>
 
 namespace VulkanSandbox {
 
+	// See VulkanPipeline::getDefaultPipelineConfigInfo(..) for default settings
+	struct PipelineConfigInfo { 
+
+		VkPipelineInputAssemblyStateCreateInfo inputAssemblyInfo;
+		VkViewport viewport;
+		VkRect2D scissor;
+		VkPipelineViewportStateCreateInfo viewportInfo;
+		VkPipelineRasterizationStateCreateInfo rasterizationInfo;
+		VkPipelineMultisampleStateCreateInfo multisampleInfo;
+		VkPipelineColorBlendAttachmentState colorBlendAttachment;
+		VkPipelineColorBlendStateCreateInfo colorBlendInfo;
+		VkPipelineDepthStencilStateCreateInfo depthStencilInfo;
+
+		// No default values
+		VkPipelineLayout pipelineLayout = nullptr;
+		VkRenderPass renderPass = nullptr;
+		uint32_t subpass = 0;
+	};
+
 	class VulkanPipeline {
+
 	public:
-		VulkanPipeline(const std::string& vertexShaderFilepath, const std::string& fragmentShaderFilepath);
+
+		VulkanPipeline(
+			VulkanDevice& vulkanDevice,
+			const std::string& vertexShaderFilepath,
+			const std::string& fragmentShaderFilepath,
+			const PipelineConfigInfo& configInfo);
+
+		~VulkanPipeline();
+
+		VulkanPipeline(const VulkanPipeline&) = delete;
+		void operator=(const VulkanPipeline&) = delete;
+
+		static PipelineConfigInfo getDefaultPipelineConfigInfo(uint32_t width, uint32_t height);
 
 	private:
-		std::vector<char> readFile(const std::string& filepath);
-		void createGraphicsPipeline(const std::string& vertexShaderFilepath, const std::string& fragmentShaderFilepath);
 
+		void createGraphicsPipeline(
+			const std::string& vertexShaderFilepath,
+			const std::string& fragmentShaderFilepath,
+			const PipelineConfigInfo& configInfo);
+
+		std::vector<char> readFile(const std::string& filepath);
+
+		void createShaderModule(const std::vector<char>& shaderSourceCode, VkShaderModule* shaderModule);
+
+		VulkanDevice& vulkanDeviceRef;
+		VkPipeline graphicsPipeline;
+		VkShaderModule vertexShaderModule;
+		VkShaderModule fragmentShaderModule;
 	};
 
 }

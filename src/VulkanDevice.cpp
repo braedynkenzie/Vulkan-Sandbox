@@ -8,7 +8,9 @@
 
 namespace VulkanSandbox {
 
-	// local callback functions
+	// Local callback functions
+	////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////
 	static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
 		VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
 		VkDebugUtilsMessageTypeFlagsEXT messageType,
@@ -46,15 +48,18 @@ namespace VulkanSandbox {
 			func(instance, debugMessenger, pAllocator);
 		}
 	}
+	////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////
 
-	// class member functions
+	// Class member functions below
+	
 	VulkanDevice::VulkanDevice(SandboxWindow& window) : window{ window } {
-		createInstance();
-		setupDebugMessenger();
-		createSurface();
-		pickPhysicalDevice();
-		createLogicalDevice();
-		createCommandPool();
+		createInstance();		// Initialize vulkan
+		setupDebugMessenger();	// Debug mode (TODO: turn off when running in release mode)
+		createSurface();		// Create GLFW window surface to bind to vulkan framebuffer
+		pickPhysicalDevice();	// Selects graphics device to be used for rendering
+		createLogicalDevice();	// Describes used features of physical device ^
+		createCommandPool();	// Command buffer allocation
 	}
 
 	VulkanDevice::~VulkanDevice() {

@@ -1,5 +1,7 @@
 #include "SandboxWindow.hpp"
 
+#include <stdexcept>
+
 namespace VulkanSandbox
 {
 	SandboxWindow::SandboxWindow(int windowWidth, int windowHeight, std::string name)
@@ -26,6 +28,12 @@ namespace VulkanSandbox
 	bool SandboxWindow::shouldClose() 
 	{
 		return glfwWindowShouldClose(window);
+	}
+
+	void SandboxWindow::createWindowSurface(VkInstance vulkanInstance, VkSurfaceKHR* vulkanSurface)
+	{
+		if (glfwCreateWindowSurface(vulkanInstance, window, nullptr, vulkanSurface) != VK_SUCCESS)
+			throw std::runtime_error("Failed to create a window surface!");
 	}
 }
 

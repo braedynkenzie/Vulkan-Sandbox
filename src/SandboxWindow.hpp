@@ -19,6 +19,8 @@ namespace VulkanSandbox {
 
 		bool shouldClose();
 
+		void createWindowSurface(VkInstance vulkanInstance, VkSurfaceKHR* vulkanSurface);
+
 	private:
 		const int width;
 		const int height;

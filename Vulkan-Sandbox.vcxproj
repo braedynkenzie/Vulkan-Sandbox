@@ -159,10 +159,12 @@
     <ClCompile Include="src/SandboxApp.cpp" />
     <ClCompile Include="src/SandboxApp.hpp" />
     <ClCompile Include="src/SandboxWindow.cpp" />
+    <ClCompile Include="src\VulkanDevice.cpp" />
     <ClCompile Include="src\VulkanPipeline.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src/SandboxWindow.hpp" />
+    <ClInclude Include="src\VulkanDevice.hpp" />
     <ClInclude Include="src\VulkanPipeline.hpp" />
   </ItemGroup>
   <ItemGroup>

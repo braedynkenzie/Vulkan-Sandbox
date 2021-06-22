@@ -17,6 +17,7 @@ namespace VulkanSandbox {
 		SandboxWindow(const SandboxWindow&) = delete;
 		SandboxWindow& operator=(const SandboxWindow&) = delete;
 
+		VkExtent2D getExtent() { return VkExtent2D{ static_cast<uint32_t>(width), static_cast<uint32_t>(height) }; }
 		bool shouldClose();
 
 		void createWindowSurface(VkInstance vulkanInstance, VkSurfaceKHR* vulkanSurface);

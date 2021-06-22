@@ -2,7 +2,6 @@
 
 #include "SandboxWindow.hpp"
 
-// std lib headers
 #include <string>
 #include <vector>
 
@@ -105,4 +104,4 @@ namespace VulkanSandbox {
 		const std::vector<const char*> deviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
 	};
 
-}  // namespace lve
+} 

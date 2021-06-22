@@ -1,6 +1,5 @@
 #include "VulkanDevice.hpp"
 
-// std headers
 #include <cstring>
 #include <iostream>
 #include <set>
@@ -76,14 +75,14 @@ namespace VulkanSandbox {
 
 	void VulkanDevice::createInstance() {
 		if (enableValidationLayers && !checkValidationLayerSupport()) {
-			throw std::runtime_error("validation layers requested, but not available!");
+			throw std::runtime_error("Validation layers requested, but not available!");
 		}
 
 		VkApplicationInfo appInfo = {};
 		appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-		appInfo.pApplicationName = "LittleVulkanEngine App";
+		appInfo.pApplicationName = "VulkanSandbox App";
 		appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-		appInfo.pEngineName = "No Engine";
+		appInfo.pEngineName = "TODO: engine name";
 		appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
 		appInfo.apiVersion = VK_API_VERSION_1_0;
 
@@ -109,7 +108,7 @@ namespace VulkanSandbox {
 		}
 
 		if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS) {
-			throw std::runtime_error("failed to create instance!");
+			throw std::runtime_error("Failed to create instance!");
 		}
 
 		hasGflwRequiredInstanceExtensions();
@@ -119,7 +118,7 @@ namespace VulkanSandbox {
 		uint32_t deviceCount = 0;
 		vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
 		if (deviceCount == 0) {
-			throw std::runtime_error("failed to find GPUs with Vulkan support!");
+			throw std::runtime_error("Failed to find GPUs with Vulkan support!");
 		}
 		std::cout << "Device count: " << deviceCount << std::endl;
 		std::vector<VkPhysicalDevice> devices(deviceCount);
@@ -133,11 +132,11 @@ namespace VulkanSandbox {
 		}
 
 		if (physicalDevice == VK_NULL_HANDLE) {
-			throw std::runtime_error("failed to find a suitable GPU!");
+			throw std::runtime_error("Failed to find a suitable GPU!");
 		}
 
 		vkGetPhysicalDeviceProperties(physicalDevice, &properties);
-		std::cout << "physical device: " << properties.deviceName << std::endl;
+		std::cout << "Physical device: " << properties.deviceName << std::endl;
 	}
 
 	void VulkanDevice::createLogicalDevice() {
@@ -180,7 +179,7 @@ namespace VulkanSandbox {
 		}
 
 		if (vkCreateDevice(physicalDevice, &createInfo, nullptr, &device_) != VK_SUCCESS) {
-			throw std::runtime_error("failed to create logical device!");
+			throw std::runtime_error("Failed to create logical device!");
 		}
 
 		vkGetDeviceQueue(device_, indices.graphicsFamily, 0, &graphicsQueue_);
@@ -197,7 +196,7 @@ namespace VulkanSandbox {
 			VK_COMMAND_POOL_CREATE_TRANSIENT_BIT | VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
 
 		if (vkCreateCommandPool(device_, &poolInfo, nullptr, &commandPool) != VK_SUCCESS) {
-			throw std::runtime_error("failed to create command pool!");
+			throw std::runtime_error("Failed to create command pool!");
 		}
 	}
 
@@ -225,7 +224,10 @@ namespace VulkanSandbox {
 		VkDebugUtilsMessengerCreateInfoEXT& createInfo) {
 		createInfo = {};
 		createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-		createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+		createInfo.messageSeverity = 
+			VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | 
+			//VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | 
+			VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT |
 			VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
 		createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
 			VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
@@ -288,14 +290,14 @@ namespace VulkanSandbox {
 		std::vector<VkExtensionProperties> extensions(extensionCount);
 		vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensions.data());
 
-		std::cout << "available extensions:" << std::endl;
+		std::cout << "Available extensions:" << std::endl;
 		std::unordered_set<std::string> available;
 		for (const auto& extension : extensions) {
 			std::cout << "\t" << extension.extensionName << std::endl;
 			available.insert(extension.extensionName);
 		}
 
-		std::cout << "required extensions:" << std::endl;
+		std::cout << "Required extensions:" << std::endl;
 		auto requiredExtensions = getRequiredExtensions();
 		for (const auto& required : requiredExtensions) {
 			std::cout << "\t" << required << std::endl;
@@ -396,7 +398,7 @@ namespace VulkanSandbox {
 				return format;
 			}
 		}
-		throw std::runtime_error("failed to find supported format!");
+		throw std::runtime_error("Failed to find supported format!");
 	}
 
 	uint32_t VulkanDevice::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) {
@@ -409,7 +411,7 @@ namespace VulkanSandbox {
 			}
 		}
 
-		throw std::runtime_error("failed to find suitable memory type!");
+		throw std::runtime_error("Failed to find suitable memory type!");
 	}
 
 	void VulkanDevice::createBuffer(
@@ -425,7 +427,7 @@ namespace VulkanSandbox {
 		bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
 		if (vkCreateBuffer(device_, &bufferInfo, nullptr, &buffer) != VK_SUCCESS) {
-			throw std::runtime_error("failed to create vertex buffer!");
+			throw std::runtime_error("Failed to create vertex buffer!");
 		}
 
 		VkMemoryRequirements memRequirements;
@@ -437,7 +439,7 @@ namespace VulkanSandbox {
 		allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, properties);
 
 		if (vkAllocateMemory(device_, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS) {
-			throw std::runtime_error("failed to allocate vertex buffer memory!");
+			throw std::runtime_error("Failed to allocate vertex buffer memory!");
 		}
 
 		vkBindBufferMemory(device_, buffer, bufferMemory, 0);
@@ -520,7 +522,7 @@ namespace VulkanSandbox {
 		VkImage& image,
 		VkDeviceMemory& imageMemory) {
 		if (vkCreateImage(device_, &imageInfo, nullptr, &image) != VK_SUCCESS) {
-			throw std::runtime_error("failed to create image!");
+			throw std::runtime_error("Failed to create image!");
 		}
 
 		VkMemoryRequirements memRequirements;
@@ -532,12 +534,12 @@ namespace VulkanSandbox {
 		allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, properties);
 
 		if (vkAllocateMemory(device_, &allocInfo, nullptr, &imageMemory) != VK_SUCCESS) {
-			throw std::runtime_error("failed to allocate image memory!");
+			throw std::runtime_error("Failed to allocate image memory!");
 		}
 
 		if (vkBindImageMemory(device_, image, imageMemory, 0) != VK_SUCCESS) {
-			throw std::runtime_error("failed to bind image memory!");
+			throw std::runtime_error("Failed to bind image memory!");
 		}
 	}
 
-}  // namespace lve
+}  

@@ -42,13 +42,6 @@ namespace VulkanSandbox {
 		configInfo.scissor.offset = { 0,0 };
 		configInfo.scissor.extent = { width, height };
 
-		// VkPipelineViewportStateCreateInfo (combines the above two state elements)
-		configInfo.viewportInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-		configInfo.viewportInfo.viewportCount = 1;
-		configInfo.viewportInfo.pViewports = &configInfo.viewport; // pointer to properties set above
-		configInfo.viewportInfo.scissorCount = 1;
-		configInfo.viewportInfo.pScissors = &configInfo.scissor; // pointer to properties set above
-
 		// VkPipelineRasterizationStateCreateInfo
 		configInfo.rasterizationInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
 		configInfo.rasterizationInfo.depthClampEnable = VK_FALSE; // clamps depth buffer to [0,1]
@@ -137,10 +130,10 @@ namespace VulkanSandbox {
 		shaderStagesInfo[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 		shaderStagesInfo[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
 		shaderStagesInfo[1].module = fragmentShaderModule;
-		shaderStagesInfo[0].pName = "main";
-		shaderStagesInfo[0].flags = 0;
-		shaderStagesInfo[0].pNext = nullptr;
-		shaderStagesInfo[0].pSpecializationInfo = nullptr;
+		shaderStagesInfo[1].pName = "main";
+		shaderStagesInfo[1].flags = 0;
+		shaderStagesInfo[1].pNext = nullptr;
+		shaderStagesInfo[1].pSpecializationInfo = nullptr;
 
 		// Define how the vertex buffer data is interpreted 
 		VkPipelineVertexInputStateCreateInfo vertexShaderInputInfo{}; 
@@ -149,6 +142,14 @@ namespace VulkanSandbox {
 		vertexShaderInputInfo.vertexBindingDescriptionCount = 0; // TODO when shaders have vertex buffers
 		vertexShaderInputInfo.pVertexAttributeDescriptions = nullptr;
 		vertexShaderInputInfo.pVertexBindingDescriptions = nullptr;
+
+		// VkPipelineViewportStateCreateInfo (combines the above two state elements)
+		VkPipelineViewportStateCreateInfo viewportInfo{};
+		viewportInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+		viewportInfo.viewportCount = 1;
+		viewportInfo.pViewports = &configInfo.viewport; // pointer to properties set above
+		viewportInfo.scissorCount = 1;
+		viewportInfo.pScissors = &configInfo.scissor; // pointer to properties set above
 
 		// Now, combine all of these settings into a single struct
 		VkGraphicsPipelineCreateInfo vulkanPipelineInfo{};
@@ -160,7 +161,7 @@ namespace VulkanSandbox {
 		vulkanPipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 		// Use the given configInfo struct for the following settings:
 		vulkanPipelineInfo.pInputAssemblyState = &configInfo.inputAssemblyInfo;
-		vulkanPipelineInfo.pViewportState = &configInfo.viewportInfo;
+		vulkanPipelineInfo.pViewportState = &viewportInfo;
 		vulkanPipelineInfo.pRasterizationState = &configInfo.rasterizationInfo;
 		vulkanPipelineInfo.pMultisampleState = &configInfo.multisampleInfo;
 		vulkanPipelineInfo.pColorBlendState = &configInfo.colorBlendInfo;

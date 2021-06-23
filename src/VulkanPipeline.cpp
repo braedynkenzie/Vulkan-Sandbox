@@ -46,12 +46,11 @@ namespace VulkanSandbox {
 		configInfo.scissor.extent = { width, height };
 
 		// VkPipelineViewportStateCreateInfo (combines the above two state elements)
-		VkPipelineViewportStateCreateInfo viewportInfo{};
-		viewportInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-		viewportInfo.viewportCount = 1;
-		viewportInfo.pViewports = &configInfo.viewport; // pointer to properties set above
-		viewportInfo.scissorCount = 1;
-		viewportInfo.pScissors = &configInfo.scissor; // pointer to properties set above
+		configInfo.viewportInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+		configInfo.viewportInfo.viewportCount = 1;
+		configInfo.viewportInfo.pViewports = &configInfo.viewport; // pointer to properties set above
+		configInfo.viewportInfo.scissorCount = 1;
+		configInfo.viewportInfo.pScissors = &configInfo.scissor; // pointer to properties set above
 
 		// VkPipelineRasterizationStateCreateInfo
 		configInfo.rasterizationInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;

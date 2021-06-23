@@ -10,9 +10,13 @@ namespace VulkanSandbox {
 	// See VulkanPipeline::getDefaultPipelineConfigInfo(..) for default settings
 	struct PipelineConfigInfo { 
 
+		PipelineConfigInfo(const PipelineConfigInfo&) = delete;
+		PipelineConfigInfo& operator=(const PipelineConfigInfo&) = delete;
+
 		VkPipelineInputAssemblyStateCreateInfo inputAssemblyInfo;
 		VkViewport viewport;
-		VkRect2D scissor;
+		VkRect2D scissor; 
+		VkPipelineViewportStateCreateInfo viewportInfo;
 		VkPipelineRasterizationStateCreateInfo rasterizationInfo;
 		VkPipelineMultisampleStateCreateInfo multisampleInfo;
 		VkPipelineColorBlendAttachmentState colorBlendAttachment;
@@ -40,7 +44,9 @@ namespace VulkanSandbox {
 		VulkanPipeline(const VulkanPipeline&) = delete;
 		void operator=(const VulkanPipeline&) = delete;
 
-		static PipelineConfigInfo getDefaultPipelineConfigInfo(uint32_t width, uint32_t height);
+		void bind(VkCommandBuffer commandBuffer);
+
+		static void setupDefaultPipelineConfigInfo(PipelineConfigInfo& configInfo, uint32_t width, uint32_t height);
 
 	private:
 

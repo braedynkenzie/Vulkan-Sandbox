@@ -70,8 +70,7 @@ namespace VulkanSandbox {
 		return result;
 	}
 
-	VkResult VulkanSwapChain::submitCommandBuffers(
-		const VkCommandBuffer* buffers, uint32_t* imageIndex) {
+	VkResult VulkanSwapChain::submitCommandBuffers(const VkCommandBuffer* buffers, uint32_t* imageIndex) {
 		if (imagesInFlight[*imageIndex] != VK_NULL_HANDLE) {
 			vkWaitForFences(device.device(), 1, &imagesInFlight[*imageIndex], VK_TRUE, UINT64_MAX);
 		}
@@ -94,10 +93,8 @@ namespace VulkanSandbox {
 		submitInfo.pSignalSemaphores = signalSemaphores;
 
 		vkResetFences(device.device(), 1, &inFlightFences[currentFrame]);
-		if (vkQueueSubmit(device.graphicsQueue(), 1, &submitInfo, inFlightFences[currentFrame]) !=
-			VK_SUCCESS) {
+		if (vkQueueSubmit(device.graphicsQueue(), 1, &submitInfo, inFlightFences[currentFrame]) != VK_SUCCESS)
 			throw std::runtime_error("Failed to submit draw command buffer!");
-		}
 
 		VkPresentInfoKHR presentInfo = {};
 		presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
@@ -194,10 +191,8 @@ namespace VulkanSandbox {
 			viewInfo.subresourceRange.baseArrayLayer = 0;
 			viewInfo.subresourceRange.layerCount = 1;
 
-			if (vkCreateImageView(device.device(), &viewInfo, nullptr, &swapChainImageViews[i]) !=
-				VK_SUCCESS) {
+			if (vkCreateImageView(device.device(), &viewInfo, nullptr, &swapChainImageViews[i]) != VK_SUCCESS)
 				throw std::runtime_error("Failed to create texture image view!");
-			}
 		}
 	}
 
@@ -257,9 +252,8 @@ namespace VulkanSandbox {
 		renderPassInfo.dependencyCount = 1;
 		renderPassInfo.pDependencies = &dependency;
 
-		if (vkCreateRenderPass(device.device(), &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS) {
+		if (vkCreateRenderPass(device.device(), &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS)
 			throw std::runtime_error("Failed to create render pass!");
-		}
 	}
 
 	void VulkanSwapChain::createFramebuffers() {
@@ -277,13 +271,8 @@ namespace VulkanSandbox {
 			framebufferInfo.height = swapChainExtent.height;
 			framebufferInfo.layers = 1;
 
-			if (vkCreateFramebuffer(
-				device.device(),
-				&framebufferInfo,
-				nullptr,
-				&swapChainFramebuffers[i]) != VK_SUCCESS) {
+			if (vkCreateFramebuffer(device.device(), &framebufferInfo, nullptr, &swapChainFramebuffers[i]) != VK_SUCCESS)
 				throw std::runtime_error("Failed to create framebuffer!");
-			}
 		}
 	}
 
@@ -329,9 +318,8 @@ namespace VulkanSandbox {
 			viewInfo.subresourceRange.baseArrayLayer = 0;
 			viewInfo.subresourceRange.layerCount = 1;
 
-			if (vkCreateImageView(device.device(), &viewInfo, nullptr, &depthImageViews[i]) != VK_SUCCESS) {
+			if (vkCreateImageView(device.device(), &viewInfo, nullptr, &depthImageViews[i]) != VK_SUCCESS)
 				throw std::runtime_error("Failed to create texture image view!");
-			}
 		}
 	}
 
@@ -349,13 +337,10 @@ namespace VulkanSandbox {
 		fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-			if (vkCreateSemaphore(device.device(), &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]) !=
-				VK_SUCCESS ||
-				vkCreateSemaphore(device.device(), &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) !=
-				VK_SUCCESS ||
-				vkCreateFence(device.device(), &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS) {
+			if (vkCreateSemaphore(device.device(), &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]) != VK_SUCCESS ||
+				vkCreateSemaphore(device.device(), &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) != VK_SUCCESS ||
+				vkCreateFence(device.device(), &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS)
 				throw std::runtime_error("Failed to create synchronization objects for a frame!");
-			}
 		}
 	}
 

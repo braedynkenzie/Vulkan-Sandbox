@@ -1,6 +1,7 @@
 #include "SandboxApp.hpp"
 
 #include <stdexcept>
+#include <array>
 
 namespace VulkanSandbox {
 
@@ -20,7 +21,10 @@ namespace VulkanSandbox {
 	{
 		while (!appWindow.shouldClose()) {
 			glfwPollEvents();
+			drawFrame();
 		}
+
+		vkDeviceWaitIdle(vulkanDevice.device());
 	}
 
 	void SandboxApp::createPipelineLayout()
@@ -36,7 +40,8 @@ namespace VulkanSandbox {
 
 	void SandboxApp::createPipeline()
 	{
-		auto pipelineConfig = VulkanPipeline::getDefaultPipelineConfigInfo(vulkanSwapChain.width(), vulkanSwapChain.height());
+		PipelineConfigInfo pipelineConfig{};
+		VulkanPipeline::setupDefaultPipelineConfigInfo(pipelineConfig, vulkanSwapChain.width(), vulkanSwapChain.height());
 		pipelineConfig.renderPass = vulkanSwapChain.getRenderPass();
 		pipelineConfig.pipelineLayout = pipelineLayout;
 
@@ -49,12 +54,65 @@ namespace VulkanSandbox {
 
 	void SandboxApp::createCommandBuffers()
 	{
-		// TODO
+		commandBuffers.resize(vulkanSwapChain.imageCount());
+
+		VkCommandBufferAllocateInfo allocInfo{};
+		allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+		allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+		allocInfo.commandPool = vulkanDevice.getCommandPool();
+		allocInfo.commandBufferCount = (uint32_t)commandBuffers.size();
+
+		if (vkAllocateCommandBuffers(vulkanDevice.device(), &allocInfo, commandBuffers.data()) != VK_SUCCESS)
+			throw std::runtime_error("Failed to allocate command buffers!");
+
+		// Now iterate through and record commands to the command buffers
+		for (int i = 0; i < commandBuffers.size(); i++)
+		{
+			VkCommandBufferBeginInfo beginInfo{};
+			beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+			// Begin recording to command buffer
+			if (vkBeginCommandBuffer(commandBuffers[i], &beginInfo) != VK_SUCCESS)
+				throw std::runtime_error("Failed to begin recording to command buffer!");
+
+			// Render pass command info 
+			VkRenderPassBeginInfo renderPassInfo{};
+			renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+			renderPassInfo.renderPass = vulkanSwapChain.getRenderPass();
+			renderPassInfo.framebuffer = vulkanSwapChain.getFrameBuffer(i);
+
+			renderPassInfo.renderArea.offset = { 0, 0 };
+			renderPassInfo.renderArea.extent = vulkanSwapChain.getSwapChainExtent();
+
+			std::array<VkClearValue, 2> clearValues{};
+			clearValues[0].color = { 0.4f, 0.8f, 0.6f, 1.0f };
+			clearValues[1].depthStencil = { 1.0f, 0}; 
+			renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+			renderPassInfo.pClearValues = clearValues.data();
+
+			vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+			vulkanPipeline->bind(commandBuffers[i]);
+			vkCmdDraw(commandBuffers[i], 3, 1, 0, 0);
+
+			vkCmdEndRenderPass(commandBuffers[i]);
+
+			if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS)
+				throw std::runtime_error("Failed to record command buffer!");
+		}
 	}
 
 	void SandboxApp::drawFrame()
 	{
-		// TODO
+		uint32_t imageIndex;
+		auto result = vulkanSwapChain.acquireNextImage(&imageIndex);
+
+		if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
+			throw std::runtime_error("Failed to acquire next image index in the swap chain!");
+
+		result = vulkanSwapChain.submitCommandBuffers(&commandBuffers[imageIndex], &imageIndex);
+		if (result != VK_SUCCESS)
+			throw std::runtime_error("Failed to submit command buffer!");
 	}
 
 }

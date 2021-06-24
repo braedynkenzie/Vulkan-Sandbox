@@ -125,7 +125,7 @@ namespace VulkanSandbox {
 		std::vector<Model::Vertex> vertices1{
 			//     Positions         Colours
 				{ {  0.0f, -0.5f }, { 1.0f, 0.0f, 0.0f, 1.0f } },
-				{ {-0.35f,  0.5f }, { 0.0f, 1.0f, 0.0f, 1.0f } },
+				{ {-0.35f,  0.5f }, { 0.4f, 0.8f, 0.6f, 1.0f } },
 				{ { 0.35f,  0.5f }, { 0.0f, 0.0f, 1.0f, 1.0f } }
 		};
 		testModel1 = std::make_unique<Model>(vulkanDevice, vertices1);
@@ -133,7 +133,7 @@ namespace VulkanSandbox {
 		std::vector<Model::Vertex> vertices2{
 			//     Positions        Colours
 				{ { 0.0f, -0.8f }, { 1.0f, 0.0f, 0.0f, 1.0f } },
-				{ {-0.1f, -0.5f }, { 0.0f, 1.0f, 0.0f, 1.0f } },
+				{ {-0.1f, -0.5f }, { 0.4f, 0.8f, 0.6f, 1.0f } },
 				{ { 0.1f, -0.5f }, { 0.0f, 0.0f, 1.0f, 1.0f } }
 		};
 		testModel2 = std::make_unique<Model>(vulkanDevice, vertices2);

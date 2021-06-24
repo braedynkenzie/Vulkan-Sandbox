@@ -19,7 +19,7 @@ namespace VulkanSandbox {
 		~VulkanSwapChain();
 
 		VulkanSwapChain(const VulkanSwapChain&) = delete;
-		void operator=(const VulkanSwapChain&) = delete;
+		VulkanSwapChain& operator=(const VulkanSwapChain&) = delete;
 
 		VkFramebuffer getFrameBuffer(int index) { return swapChainFramebuffers[index]; }
 		VkRenderPass getRenderPass() { return renderPass; }
@@ -47,10 +47,8 @@ namespace VulkanSandbox {
 		void createSyncObjects();
 
 		// Helper functions
-		VkSurfaceFormatKHR chooseSwapSurfaceFormat(
-			const std::vector<VkSurfaceFormatKHR>& availableFormats);
-		VkPresentModeKHR chooseSwapPresentMode(
-			const std::vector<VkPresentModeKHR>& availablePresentModes);
+		VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
+		VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
 		VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
 
 		VkFormat swapChainImageFormat;
@@ -59,11 +57,11 @@ namespace VulkanSandbox {
 		std::vector<VkFramebuffer> swapChainFramebuffers;
 		VkRenderPass renderPass;
 
-		std::vector<VkImage> depthImages;
-		std::vector<VkDeviceMemory> depthImageMemorys;
-		std::vector<VkImageView> depthImageViews;
-		std::vector<VkImage> swapChainImages;
-		std::vector<VkImageView> swapChainImageViews;
+		std::vector<VkImage>		depthImages;
+		std::vector<VkDeviceMemory> depthImageMemories;
+		std::vector<VkImageView>	depthImageViews;
+		std::vector<VkImage>		swapChainImages;
+		std::vector<VkImageView>	swapChainImageViews;
 
 		VulkanDevice& device;
 		VkExtent2D windowExtent;

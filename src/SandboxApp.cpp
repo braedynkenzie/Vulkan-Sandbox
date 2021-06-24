@@ -123,18 +123,18 @@ namespace VulkanSandbox {
 	void SandboxApp::loadSandboxModels()
 	{
 		std::vector<Model::Vertex> vertices1{
-			{ glm::vec2( 0.0f, -0.5f) },
-			{ glm::vec2(-0.4f,  0.5f) },
-			{ glm::vec2( 0.4f,  0.5f) }
+			//     Positions         Colours
+				{ {  0.0f, -0.5f }, { 1.0f, 0.0f, 0.0f, 1.0f } },
+				{ {-0.35f,  0.5f }, { 0.0f, 1.0f, 0.0f, 1.0f } },
+				{ { 0.35f,  0.5f }, { 0.0f, 0.0f, 1.0f, 1.0f } }
 		};
-
 		testModel1 = std::make_unique<Model>(vulkanDevice, vertices1);
 
-
 		std::vector<Model::Vertex> vertices2{
-			{ glm::vec2( 0.0f, -0.8f) },
-			{ glm::vec2(-0.1f, -0.5f) },
-			{ glm::vec2( 0.1f, -0.5f) }
+			//     Positions        Colours
+				{ { 0.0f, -0.8f }, { 1.0f, 0.0f, 0.0f, 1.0f } },
+				{ {-0.1f, -0.5f }, { 0.0f, 1.0f, 0.0f, 1.0f } },
+				{ { 0.1f, -0.5f }, { 0.0f, 0.0f, 1.0f, 1.0f } }
 		};
 		testModel2 = std::make_unique<Model>(vulkanDevice, vertices2);
 	}

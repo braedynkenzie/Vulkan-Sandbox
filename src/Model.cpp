@@ -64,11 +64,17 @@ namespace VulkanSandbox
 	
 	std::vector<VkVertexInputAttributeDescription> Model::Vertex::getAttributeDescriptions()
 	{
-		std::vector<VkVertexInputAttributeDescription> vertexAttribDescriptions(1);
-		vertexAttribDescriptions[0].binding = 0;
+		std::vector<VkVertexInputAttributeDescription> vertexAttribDescriptions(2); // 2 attributes per vertex (pos, colour)
+		// Vertex position
 		vertexAttribDescriptions[0].location = 0;
-		vertexAttribDescriptions[0].offset = 0;
+		vertexAttribDescriptions[0].binding = 0;
 		vertexAttribDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
+		vertexAttribDescriptions[0].offset = offsetof(Vertex, Vertex::position); // zero
+		// Vertex colour
+		vertexAttribDescriptions[1].location = 1; // as defined in vertex shader with layout(location = ...) in ...
+		vertexAttribDescriptions[1].binding = 0; // same because we are interleaving attribs in our vertex buffer
+		vertexAttribDescriptions[1].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+		vertexAttribDescriptions[1].offset = offsetof(Vertex, Vertex::colour);
 		return vertexAttribDescriptions;
 	}
 }

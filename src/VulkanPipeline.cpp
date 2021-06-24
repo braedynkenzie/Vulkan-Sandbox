@@ -1,4 +1,5 @@
 #include "VulkanPipeline.hpp"
+#include "Model.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -144,12 +145,14 @@ namespace VulkanSandbox {
 		shaderStagesInfo[1].pSpecializationInfo = nullptr;
 
 		// Define how the vertex buffer data is interpreted 
+		auto bindingDescriptions = Model::Vertex::getBindingDescriptions();
+		auto vertexAttributeDescriptions = Model::Vertex::getAttributeDescriptions();
 		VkPipelineVertexInputStateCreateInfo vertexShaderInputInfo{}; 
 		vertexShaderInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-		vertexShaderInputInfo.vertexAttributeDescriptionCount = 0; // TODO when shaders have vertex buffers
-		vertexShaderInputInfo.vertexBindingDescriptionCount = 0; // TODO when shaders have vertex buffers
-		vertexShaderInputInfo.pVertexAttributeDescriptions = nullptr;
-		vertexShaderInputInfo.pVertexBindingDescriptions = nullptr;
+		vertexShaderInputInfo.vertexBindingDescriptionCount = static_cast<uint32_t>(bindingDescriptions.size());
+		vertexShaderInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(vertexAttributeDescriptions.size());
+		vertexShaderInputInfo.pVertexBindingDescriptions = bindingDescriptions.data();
+		vertexShaderInputInfo.pVertexAttributeDescriptions = vertexAttributeDescriptions.data();
 
 		// Now, combine all of these settings into a single struct
 		VkGraphicsPipelineCreateInfo vulkanPipelineInfo{};

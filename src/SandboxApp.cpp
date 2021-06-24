@@ -7,6 +7,7 @@ namespace VulkanSandbox {
 
 	SandboxApp::SandboxApp()
 	{
+		loadSandboxModels();
 		createPipelineLayout();
 		createPipeline();
 		createCommandBuffers();
@@ -93,7 +94,11 @@ namespace VulkanSandbox {
 			vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 			vulkanPipeline->bind(commandBuffers[i]);
-			vkCmdDraw(commandBuffers[i], 3, 1, 0, 0);
+
+			testModel1->bind(commandBuffers[i]);
+			testModel1->draw(commandBuffers[i]);
+			testModel2->bind(commandBuffers[i]);
+			testModel2->draw(commandBuffers[i]);
 
 			vkCmdEndRenderPass(commandBuffers[i]);
 
@@ -113,6 +118,25 @@ namespace VulkanSandbox {
 		result = vulkanSwapChain.submitCommandBuffers(&commandBuffers[imageIndex], &imageIndex);
 		if (result != VK_SUCCESS)
 			throw std::runtime_error("Failed to submit command buffer!");
+	}
+
+	void SandboxApp::loadSandboxModels()
+	{
+		std::vector<Model::Vertex> vertices1{
+			{ glm::vec2( 0.0f, -0.5f) },
+			{ glm::vec2(-0.4f,  0.5f) },
+			{ glm::vec2( 0.4f,  0.5f) }
+		};
+
+		testModel1 = std::make_unique<Model>(vulkanDevice, vertices1);
+
+
+		std::vector<Model::Vertex> vertices2{
+			{ glm::vec2( 0.0f, -0.8f) },
+			{ glm::vec2(-0.1f, -0.5f) },
+			{ glm::vec2( 0.1f, -0.5f) }
+		};
+		testModel2 = std::make_unique<Model>(vulkanDevice, vertices2);
 	}
 
 }

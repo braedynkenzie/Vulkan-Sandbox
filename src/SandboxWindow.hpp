@@ -18,18 +18,22 @@ namespace VulkanSandbox {
 		SandboxWindow& operator=(const SandboxWindow&) = delete;
 
 		VkExtent2D getExtent() { return VkExtent2D{ static_cast<uint32_t>(width), static_cast<uint32_t>(height) }; }
-		bool shouldClose();
+		bool shouldClose() { return glfwWindowShouldClose(window); }
+		bool wasResized() { return framebufferSizeChanged; }
+		void resetSizeChangedFlag() { framebufferSizeChanged = false; }
 
 		void createWindowSurface(VkInstance vulkanInstance, VkSurfaceKHR* vulkanSurface);
 
 	private:
-		const int width;
-		const int height;
+		int width;
+		int height;
 		std::string windowName;
+		bool framebufferSizeChanged = false;
 
 		GLFWwindow* window; 
 
 		void InitWindow();
+		static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 
 	};
 

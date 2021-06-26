@@ -14,15 +14,14 @@ namespace VulkanSandbox {
 		PipelineConfigInfo& operator=(const PipelineConfigInfo&) = delete;
 
 		VkPipelineInputAssemblyStateCreateInfo inputAssemblyInfo;
-		VkViewport viewport;
-		VkRect2D scissor; 
 		VkPipelineViewportStateCreateInfo viewportInfo;
 		VkPipelineRasterizationStateCreateInfo rasterizationInfo;
 		VkPipelineMultisampleStateCreateInfo multisampleInfo;
 		VkPipelineColorBlendAttachmentState colorBlendAttachment;
 		VkPipelineColorBlendStateCreateInfo colorBlendInfo;
 		VkPipelineDepthStencilStateCreateInfo depthStencilInfo;
-
+		std::vector<VkDynamicState> dynamicStateEnables;
+		VkPipelineDynamicStateCreateInfo dynamicStateInfo;
 		// No default values
 		VkPipelineLayout pipelineLayout = nullptr;
 		VkRenderPass renderPass = nullptr;
@@ -46,7 +45,7 @@ namespace VulkanSandbox {
 
 		void bind(VkCommandBuffer commandBuffer);
 
-		static void setupDefaultPipelineConfigInfo(PipelineConfigInfo& configInfo, uint32_t width, uint32_t height);
+		static void setupDefaultPipelineConfigInfo(PipelineConfigInfo& configInfo);
 
 	private:
 

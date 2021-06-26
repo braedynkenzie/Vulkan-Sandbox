@@ -10,8 +10,21 @@
 
 namespace VulkanSandbox {
 
-	VulkanSwapChain::VulkanSwapChain(VulkanDevice& deviceRef, VkExtent2D extent)
-		: device{ deviceRef }, windowExtent{ extent } {
+	VulkanSwapChain::VulkanSwapChain(VulkanDevice& deviceRef, VkExtent2D windowExtent)
+		: device{ deviceRef }, windowExtent{ windowExtent }
+	{
+		init();
+	}
+
+	VulkanSwapChain::VulkanSwapChain(VulkanDevice& deviceRef, VkExtent2D windowExtent, std::shared_ptr<VulkanSwapChain> previousSwapChain)
+		: device{ deviceRef }, windowExtent{ windowExtent }, oldSwapChain{ previousSwapChain }
+	{
+		init();
+		oldSwapChain = nullptr;
+	}
+
+	void VulkanSwapChain::init()
+	{
 		createSwapChain();
 		createImageViews();
 		createRenderPass();
@@ -159,7 +172,7 @@ namespace VulkanSandbox {
 		createInfo.presentMode = presentMode;
 		createInfo.clipped = VK_TRUE;
 
-		createInfo.oldSwapchain = VK_NULL_HANDLE;
+		createInfo.oldSwapchain = oldSwapChain == nullptr ? VK_NULL_HANDLE : oldSwapChain->swapChain;
 
 		if (vkCreateSwapchainKHR(device.device(), &createInfo, nullptr, &swapChain) != VK_SUCCESS) {
 			throw std::runtime_error("Failed to create swap chain!");

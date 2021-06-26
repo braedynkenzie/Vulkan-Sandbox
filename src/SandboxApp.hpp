@@ -30,12 +30,15 @@ namespace VulkanSandbox {
 		void createPipelineLayout();
 		void createPipeline();
 		void createCommandBuffers();
+		void freeCommandBuffers();
 		void drawFrame();
+		void recreateSwapChain();
+		void recordCommandBuffer(int imageIndex);
 		void loadSandboxModels();
 
 		SandboxWindow appWindow{ WIDTH, HEIGHT, APP_NAME };
 		VulkanDevice vulkanDevice{ appWindow };
-		VulkanSwapChain vulkanSwapChain{ vulkanDevice, appWindow.getExtent() };
+		std::unique_ptr<VulkanSwapChain> vulkanSwapChain;
 		std::unique_ptr<VulkanPipeline> vulkanPipeline;
 		VkPipelineLayout pipelineLayout;
 		std::vector<VkCommandBuffer> commandBuffers;

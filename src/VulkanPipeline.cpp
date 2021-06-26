@@ -27,31 +27,19 @@ namespace VulkanSandbox {
 		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 	}
 
-	void VulkanPipeline::setupDefaultPipelineConfigInfo(PipelineConfigInfo& configInfo, uint32_t width, uint32_t height)
+	void VulkanPipeline::setupDefaultPipelineConfigInfo(PipelineConfigInfo& configInfo)
 	{
 		// VkPipelineInputAssemblyStateCreateInfo
 		configInfo.inputAssemblyInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
 		configInfo.inputAssemblyInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 		configInfo.inputAssemblyInfo.primitiveRestartEnable = VK_FALSE;
 
-		// VkViewport
-		configInfo.viewport.x = 0.0f;
-		configInfo.viewport.y = 0.0f;
-		configInfo.viewport.width = static_cast<float>(width);
-		configInfo.viewport.height = static_cast<float>(height);
-		configInfo.viewport.minDepth = 0.0f;
-		configInfo.viewport.maxDepth = 1.0f;
-
-		// VkRect2D (crops viewport)
-		configInfo.scissor.offset = { 0,0 };
-		configInfo.scissor.extent = { width, height };
-
 		// VkPipelineViewportStateCreateInfo (combines the above two state elements)
 		configInfo.viewportInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
 		configInfo.viewportInfo.viewportCount = 1;
-		configInfo.viewportInfo.pViewports = &configInfo.viewport; // pointer to properties set above
+		configInfo.viewportInfo.pViewports = nullptr;
 		configInfo.viewportInfo.scissorCount = 1;
-		configInfo.viewportInfo.pScissors = &configInfo.scissor; // pointer to properties set above
+		configInfo.viewportInfo.pScissors = nullptr; 
 
 		// VkPipelineRasterizationStateCreateInfo
 		configInfo.rasterizationInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
@@ -108,6 +96,15 @@ namespace VulkanSandbox {
 		configInfo.depthStencilInfo.stencilTestEnable = VK_FALSE;
 		configInfo.depthStencilInfo.front = {};
 		configInfo.depthStencilInfo.back = {}; 
+
+		// std::vector<VkDynamicState>
+		configInfo.dynamicStateEnables = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
+
+		// VkPipelineDynamicStateCreateInfo
+		configInfo.dynamicStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+		configInfo.dynamicStateInfo.pDynamicStates = configInfo.dynamicStateEnables.data();
+		configInfo.dynamicStateInfo.dynamicStateCount = static_cast<uint32_t>(configInfo.dynamicStateEnables.size());
+		configInfo.dynamicStateInfo.flags = 0;
 	}
 
 	void VulkanPipeline::createGraphicsPipeline(const std::string& vertexShaderFilepath, const std::string& fragmentShaderFilepath, const PipelineConfigInfo& configInfo)
@@ -169,7 +166,7 @@ namespace VulkanSandbox {
 		vulkanPipelineInfo.pMultisampleState = &configInfo.multisampleInfo;
 		vulkanPipelineInfo.pColorBlendState = &configInfo.colorBlendInfo;
 		vulkanPipelineInfo.pDepthStencilState = &configInfo.depthStencilInfo;
-		vulkanPipelineInfo.pDynamicState = nullptr;
+		vulkanPipelineInfo.pDynamicState = &configInfo.dynamicStateInfo;
 		vulkanPipelineInfo.layout = configInfo.pipelineLayout;
 		vulkanPipelineInfo.renderPass = configInfo.renderPass;
 		vulkanPipelineInfo.subpass = configInfo.subpass;

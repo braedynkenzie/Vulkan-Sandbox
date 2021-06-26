@@ -2,12 +2,11 @@
 
 #include "VulkanDevice.hpp"
 
-// vulkan headers
 #include <vulkan/vulkan.h>
 
-// std lib headers
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace VulkanSandbox {
 
@@ -16,6 +15,7 @@ namespace VulkanSandbox {
 		static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
 		VulkanSwapChain(VulkanDevice& deviceRef, VkExtent2D windowExtent);
+		VulkanSwapChain(VulkanDevice& deviceRef, VkExtent2D windowExtent, std::shared_ptr<VulkanSwapChain> previousSwapChain);
 		~VulkanSwapChain();
 
 		VulkanSwapChain(const VulkanSwapChain&) = delete;
@@ -39,6 +39,7 @@ namespace VulkanSandbox {
 		VkResult submitCommandBuffers(const VkCommandBuffer* buffers, uint32_t* imageIndex);
 
 	private:
+		void init();
 		void createSwapChain();
 		void createImageViews();
 		void createDepthResources();
@@ -67,6 +68,7 @@ namespace VulkanSandbox {
 		VkExtent2D windowExtent;
 
 		VkSwapchainKHR swapChain;
+		std::shared_ptr<VulkanSwapChain> oldSwapChain;
 
 		std::vector<VkSemaphore> imageAvailableSemaphores;
 		std::vector<VkSemaphore> renderFinishedSemaphores;

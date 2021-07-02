@@ -44,7 +44,6 @@ namespace VulkanSandbox {
 		std::vector<VkCommandBuffer> commandBuffers;
 
 		std::unique_ptr<Model> testModel1;
-		std::unique_ptr<Model> testModel2;
 	};
 
 

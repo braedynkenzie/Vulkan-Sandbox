@@ -1,9 +1,20 @@
 #include "SandboxApp.hpp"
 
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#define GLM_FORCE_RADIANS
+#include <glm/glm.hpp>
+
 #include <stdexcept>
 #include <array>
+#include <iostream>
 
 namespace VulkanSandbox {
+
+	// Temp
+	struct BasicPushConstantData {
+		glm::vec2 offset;
+		alignas(16) glm::vec4 colour;
+	};
 
 	SandboxApp::SandboxApp()
 	{
@@ -20,6 +31,8 @@ namespace VulkanSandbox {
 
 	void SandboxApp::run()
 	{
+		std::cout << "\nMax push constant size: " << vulkanDevice.properties.limits.maxPushConstantsSize << std::endl;
+
 		while (!appWindow.shouldClose()) {
 			glfwPollEvents();
 			drawFrame();
@@ -30,11 +43,17 @@ namespace VulkanSandbox {
 
 	void SandboxApp::createPipelineLayout()
 	{
+		VkPushConstantRange pushConstantRange{};
+		pushConstantRange.size = sizeof(BasicPushConstantData);
+		pushConstantRange.offset = 0;
+		pushConstantRange.stageFlags = 
+			VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT; // so that the push constants can be accessed from either shader
+
 		VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
 		pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 		pipelineLayoutInfo.pSetLayouts = nullptr;
-		pipelineLayoutInfo.pushConstantRangeCount = 0;
-		pipelineLayoutInfo.pPushConstantRanges = nullptr;
+		pipelineLayoutInfo.pushConstantRangeCount = 1;
+		pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
 		if (vkCreatePipelineLayout(vulkanDevice.device(), &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS)
 			throw std::runtime_error("Failed to create pipeline layout!");
 	}
@@ -135,6 +154,9 @@ namespace VulkanSandbox {
 
 	void SandboxApp::recordCommandBuffer(int imageIndex)
 	{
+		static int frame = 0;
+		frame = (frame + 1) % 10000;
+
 		VkCommandBufferBeginInfo beginInfo{};
 		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
@@ -177,9 +199,23 @@ namespace VulkanSandbox {
 		vulkanPipeline->bind(commandBuffers[imageIndex]);
 
 		testModel1->bind(commandBuffers[imageIndex]);
-		testModel1->draw(commandBuffers[imageIndex]);
-		testModel2->bind(commandBuffers[imageIndex]);
-		testModel2->draw(commandBuffers[imageIndex]);
+		for (int i = 0; i < 4; i++)
+		{
+			// Create and pass push constants to shaders, then draw
+			BasicPushConstantData pushConstantData{};
+			pushConstantData.offset = glm::vec2(0.2f * i * ((float)frame / 10000.0f), 0.2f * i * ((float)frame / 10000.0f));
+			pushConstantData.colour = glm::vec4(0.2f * i, 0.2f * i, 0.2f * i, 0.5f + 0.2f * i);
+			vkCmdPushConstants(
+				commandBuffers[imageIndex],
+				pipelineLayout,
+				VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+				0,
+				sizeof(BasicPushConstantData),
+				&pushConstantData);
+
+			testModel1->draw(commandBuffers[imageIndex]);
+		}
+
 
 		vkCmdEndRenderPass(commandBuffers[imageIndex]);
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -198,13 +234,5 @@ namespace VulkanSandbox {
 				{ { 0.35f,  0.5f }, { 0.0f, 0.0f, 1.0f, 1.0f } }
 		};
 		testModel1 = std::make_unique<Model>(vulkanDevice, vertices1);
-
-		std::vector<Model::Vertex> vertices2{
-			//     Positions        Colours
-				{ { 0.0f, -0.8f }, { 1.0f, 0.0f, 0.0f, 1.0f } },
-				{ {-0.1f, -0.5f }, { 0.4f, 0.8f, 0.6f, 1.0f } },
-				{ { 0.1f, -0.5f }, { 0.0f, 0.0f, 1.0f, 1.0f } }
-		};
-		testModel2 = std::make_unique<Model>(vulkanDevice, vertices2);
 	}
 }

@@ -4,7 +4,7 @@
 #include "VulkanPipeline.hpp"
 #include "VulkanDevice.hpp"
 #include "VulkanSwapChain.hpp"
-#include "Model.hpp"
+#include "SandboxObject.hpp"
 
 #include <memory>
 #include <vector>
@@ -34,7 +34,8 @@ namespace VulkanSandbox {
 		void drawFrame();
 		void recreateSwapChain();
 		void recordCommandBuffer(int imageIndex);
-		void loadSandboxModels();
+		void renderSandboxObjects(VkCommandBuffer commandBuffer);
+		void loadSandboxObjects();
 
 		SandboxWindow appWindow{ WIDTH, HEIGHT, APP_NAME };
 		VulkanDevice vulkanDevice{ appWindow };
@@ -43,7 +44,8 @@ namespace VulkanSandbox {
 		VkPipelineLayout pipelineLayout;
 		std::vector<VkCommandBuffer> commandBuffers;
 
-		std::unique_ptr<Model> testModel1;
+		// Temp
+		std::vector<SandboxObject> sandboxObjects;
 	};
 
 

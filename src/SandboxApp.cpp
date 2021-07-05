@@ -3,6 +3,7 @@
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
+#include <glm/gtc/constants.hpp>
 
 #include <stdexcept>
 #include <array>
@@ -12,13 +13,14 @@ namespace VulkanSandbox {
 
 	// Temp
 	struct BasicPushConstantData {
-		glm::vec2 offset;
+		glm::mat2 transform{ 1.0f };
+		alignas(8) glm::vec2 offset;
 		alignas(16) glm::vec4 colour;
 	};
 
 	SandboxApp::SandboxApp()
 	{
-		loadSandboxModels();
+		loadSandboxObjects();
 		createPipelineLayout();
 		recreateSwapChain();
 		createCommandBuffers();
@@ -196,26 +198,7 @@ namespace VulkanSandbox {
 		VkRect2D scissor{ { 0,0 }, extent };
 		vkCmdSetScissor(commandBuffers[imageIndex], 0, 1, &scissor);
 
-		vulkanPipeline->bind(commandBuffers[imageIndex]);
-
-		testModel1->bind(commandBuffers[imageIndex]);
-		for (int i = 0; i < 4; i++)
-		{
-			// Create and pass push constants to shaders, then draw
-			BasicPushConstantData pushConstantData{};
-			pushConstantData.offset = glm::vec2(0.2f * i * ((float)frame / 10000.0f), 0.2f * i * ((float)frame / 10000.0f));
-			pushConstantData.colour = glm::vec4(0.2f * i, 0.2f * i, 0.2f * i, 0.5f + 0.2f * i);
-			vkCmdPushConstants(
-				commandBuffers[imageIndex],
-				pipelineLayout,
-				VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
-				0,
-				sizeof(BasicPushConstantData),
-				&pushConstantData);
-
-			testModel1->draw(commandBuffers[imageIndex]);
-		}
-
+		renderSandboxObjects(commandBuffers[imageIndex]);
 
 		vkCmdEndRenderPass(commandBuffers[imageIndex]);
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -225,14 +208,51 @@ namespace VulkanSandbox {
 			throw std::runtime_error("Failed to record command buffer!");
 	}
 
-	void SandboxApp::loadSandboxModels()
+	void SandboxApp::renderSandboxObjects(VkCommandBuffer commandBuffer)
 	{
-		std::vector<Model::Vertex> vertices1{
+		vulkanPipeline->bind(commandBuffer);
+
+		for (SandboxObject& object : sandboxObjects)
+		{
+			object.transform2D.rotation = object.transform2D.rotation + 0.00005;
+
+			// Create and pass push constants to shaders, then draw
+			BasicPushConstantData pushConstantData{};
+			pushConstantData.transform = object.transform2D.mat2();
+			pushConstantData.offset = object.transform2D.translation;
+			pushConstantData.colour = object.colour;
+			vkCmdPushConstants(
+				commandBuffer,
+				pipelineLayout,
+				VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+				0,
+				sizeof(BasicPushConstantData),
+				&pushConstantData);
+
+			object.model->bind(commandBuffer);
+			object.model->draw(commandBuffer);
+		}
+	}
+
+	void SandboxApp::loadSandboxObjects()
+	{
+		std::vector<Model::Vertex> vertices{
 			//     Positions         Colours
 				{ {  0.0f, -0.5f }, { 1.0f, 0.0f, 0.0f, 1.0f } },
 				{ {-0.35f,  0.5f }, { 0.4f, 0.8f, 0.6f, 1.0f } },
 				{ { 0.35f,  0.5f }, { 0.0f, 0.0f, 1.0f, 1.0f } }
 		};
-		testModel1 = std::make_unique<Model>(vulkanDevice, vertices1);
+		std::shared_ptr<Model> testModel = std::make_shared<Model>(vulkanDevice, vertices);
+
+		SandboxObject triangleObject = SandboxObject::createSandboxObject();
+		triangleObject.model = testModel;
+		triangleObject.colour = glm::vec4(0.6f, 0.9f, 0.8f, 1.0f);
+		triangleObject.transform2D.translation.x = 0.0f;
+		triangleObject.transform2D.translation.y = 0.0f;
+		triangleObject.transform2D.rotation = glm::pi<float>() / 2.0f;
+		triangleObject.transform2D.scale.x = 1.0f;
+		triangleObject.transform2D.scale.y = 2.0f;
+
+		sandboxObjects.push_back(std::move(triangleObject));
 	}
 }
